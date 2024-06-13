@@ -1,22 +1,42 @@
 from simple_websocket_server import WebSocketServer, WebSocket
 
-
+import  json
 class ChatServer(WebSocket):
+
+    clients = []
     def handle(self):
         # what will happen when the server receive a message
         # echo message back to client
-        self.send_message(self.data)
+        # self.send_message(self.data)
+        print(f'Data received: {self.data}')
+        msg_content = ChatServer.load_from_json(self.data)
+        print(msg_content, type(msg_content))
+        if msg_content['type'] == 'login':
+            self.username = msg_content['username']
+            print(self.username)
+
 
     def connected(self):
         # what will I do when the client connects to me
         print(self.address, 'connected')
+        ChatServer.clients.append(self)
+        print(ChatServer.clients)
+
 
     def handle_close(self):
         # what will I do when the client close the connection
         print(self.address, 'closed')
+        ChatServer.clients.remove(self)
+
+    @staticmethod
+    def load_from_json(anystring: str):
+        try:
+            return  json.loads(anystring)
+        except Exception as e:
+            return  {}
 
 
 if __name__ == '__main__':
     server = WebSocketServer('', 8000, ChatServer)
-    print(server)
+    print(server.__dict__)
     server.serve_forever()
