@@ -5,6 +5,10 @@ let username_h1 = document.getElementById(
 let chat_div  =document.getElementById('chat');
 let chat_msg = document.getElementById('chatmsg')
 let send_btn = document.getElementById('send')
+let clear_btn = document.getElementById('clear')
+let online_lst = document.getElementById('online')
+
+
 
 username= prompt('Please enter your name : ')
 username_h1.innerHTML =username
@@ -36,6 +40,7 @@ mywebsocket.onopen = function (){
 mywebsocket.onmessage= function (event){
     console.log(event)
     let received_msg = JSON.parse(event.data)
+    console.log(received_msg.online)
     if (received_msg.type==='login'){
         chat_div.innerHTML +=`<h3 style="color: green; text-align: center">${received_msg.body}</h3>`
     }else if(received_msg.type==='logout'){
@@ -46,6 +51,16 @@ mywebsocket.onmessage= function (event){
 
     }
 
+    online_lst.innerHTML = ''
+    online_users = received_msg.online
+    online_users.forEach((user)=>{
+        online_lst.innerHTML += `<li id="${user.id}"> ${user.name} </li>`
+    })
+
+
+
+
+
 }
 
 send_btn.addEventListener('click', function (){
@@ -54,11 +69,15 @@ send_btn.addEventListener('click', function (){
         type: 'chat',
         body: msg_val
     }
-    chat_div.innerHTML +=`<h2  class="w-50 ms-auto bg-dark text-light rounded-2 p-2 mx-2 " >Me:${chat_msg.value}</h2>`
+    chat_div.innerHTML +=`<h2  class="w-50 ms-auto bg-warning  rounded-2 p-2 mx-2 " >Me:${chat_msg.value}</h2>`
     msg_to_send= JSON.stringify(msg_to_send);
     mywebsocket.send(msg_to_send);
     chat_msg.value = '';
 
+})
+
+clear_btn.addEventListener('click', function (){
+    chat_div.innerHTML ='';
 })
 
 
