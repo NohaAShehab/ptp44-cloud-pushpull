@@ -1,15 +1,18 @@
 from simple_websocket_server import WebSocketServer, WebSocket
 
-import  json
-class ChatServer(WebSocket):
+import json
 
+
+class ChatServer(WebSocket):
     clients = []
 
     @classmethod
-    def send_to_all_clients(cls, msg: dict):
+    def send_to_all_clients(cls, msg: dict, sender=None):
         msg = json.dumps(msg)
         for client in cls.clients:
-            client.send_message(msg)
+            if client != sender:
+                client.send_message(msg)
+
     def handle(self):
         # what will happen when the server receive a message
         # echo message back to client
@@ -21,15 +24,13 @@ class ChatServer(WebSocket):
         if msg_content['type'] == 'login':
             self.username = msg_content['username']
             print(self.username)
-            msg_to_send['body']= f"{self.username} has been connected"
+            msg_to_send['body'] = f"{self.username} has been connected"
             msg_to_send['type'] = "login"
+        elif msg_content['type'] == 'chat':
+            msg_to_send['body'] = msg_content['body']
+            msg_to_send['type'] = "chat"
 
-        msg_to_send = json.dumps(msg_to_send)
-
-        # send message to all users =--> to say user has been connected ?
-        for client in ChatServer.clients:
-            client.send_message(msg_to_send)
-
+        ChatServer.send_to_all_clients(msg_to_send, self )
 
     def connected(self):
         # what will I do when the client connects to me
@@ -37,24 +38,22 @@ class ChatServer(WebSocket):
         ChatServer.clients.append(self)
         print(ChatServer.clients)
 
-
     def handle_close(self):
         # what will I do when the client close the connection
         print(self.address, 'closed')
         ChatServer.clients.remove(self)
         # send message to all users that user has left
         msg_to_send = {}
-        msg_to_send['type'] ='logout'
-        msg_to_send['body']= f"{self.username} has been disconnected"
+        msg_to_send['type'] = 'logout'
+        msg_to_send['body'] = f"{self.username} has been disconnected"
         ChatServer.send_to_all_clients(msg_to_send)
-
 
     @staticmethod
     def load_from_json(anystring: str):
         try:
-            return  json.loads(anystring)
+            return json.loads(anystring)
         except Exception as e:
-            return  {}
+            return {}
 
 
 if __name__ == '__main__':

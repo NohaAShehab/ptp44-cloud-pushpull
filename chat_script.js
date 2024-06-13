@@ -41,10 +41,25 @@ mywebsocket.onmessage= function (event){
     }else if(received_msg.type==='logout'){
         chat_div.innerHTML +=`<h3 style="color: red; text-align: center">${received_msg.body}</h3>`
 
+    } else if(received_msg.type==='chat'){
+        chat_div.innerHTML +=`<h3 class="w-50 bg-light rounded-2 p-2 mx-2 " >${received_msg.body}</h3>`
+
     }
 
 }
 
+send_btn.addEventListener('click', function (){
+    let msg_val = `${username}:${chat_msg.value}.`
+    let msg_to_send= {
+        type: 'chat',
+        body: msg_val
+    }
+    chat_div.innerHTML +=`<h2  class="w-50 ms-auto bg-dark text-light rounded-2 p-2 mx-2 " >Me:${chat_msg.value}</h2>`
+    msg_to_send= JSON.stringify(msg_to_send);
+    mywebsocket.send(msg_to_send);
+    chat_msg.value = '';
+
+})
 
 
 // 3- close the connection
