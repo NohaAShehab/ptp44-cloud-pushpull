@@ -15,6 +15,10 @@ class ChatServer(WebSocket):
             self.username = msg_content['username']
             print(self.username)
 
+        # send message to all users =--> to say user has been connected ?
+        for client in ChatServer.clients:
+            client.send_message(f"{self.username} has been connected")
+
 
     def connected(self):
         # what will I do when the client connects to me

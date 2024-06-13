@@ -33,6 +33,9 @@ mywebsocket.onopen = function (){
 
 
 // 2- on message ?
+mywebsocket.onmessage= function (event){
+    console.log(event)
+}
 
 
 
