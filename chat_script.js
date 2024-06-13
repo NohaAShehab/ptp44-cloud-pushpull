@@ -7,6 +7,20 @@ let chat_msg = document.getElementById('chatmsg')
 let send_btn = document.getElementById('send')
 let clear_btn = document.getElementById('clear')
 let online_lst = document.getElementById('online')
+let private_chat_div  =document.getElementById('private_chat')
+private_chat_div.style.display="none"
+
+function add_event_to_btn(btn_id){
+    console.log("here",btn_id)
+    let btn= document.getElementById(btn_id)
+    console.log(btn)
+    btn.addEventListener('click', function (){
+        console.log('button clicked', {btn_id})
+        // private_chat_div.style.display="block"
+        private_chat_div.style.display="block"
+
+    })
+}
 
 
 
@@ -34,7 +48,11 @@ mywebsocket.onopen = function (){
     mywebsocket.send(JSON.stringify(msg_to_send))
 }
 
-
+function clicky(){
+     console.log('button clicked', {})
+        // private_chat_div.style.display="block"
+        private_chat_div.style.display="block"
+}
 
 // 2- on message ?
 mywebsocket.onmessage= function (event){
@@ -52,9 +70,19 @@ mywebsocket.onmessage= function (event){
     }
 
     online_lst.innerHTML = ''
+    private_chat_div.style.display="none"
     online_users = received_msg.online
     online_users.forEach((user)=>{
-        online_lst.innerHTML += `<li id="${user.id}"> ${user.name} </li>`
+        online_lst.innerHTML += `<li> ${user.name} </li>`
+        elem = document.createElement('button');
+        elem.id = "btn_" +user.id;
+        elem.appendChild(document.createTextNode('Click'))
+        elem.class='btn btn-success';
+        elem.addEventListener("click", clicky);
+        online_lst.append(elem)
+
+        // while sending data --> id of users
+
     })
 
 

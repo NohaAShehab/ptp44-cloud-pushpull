@@ -10,8 +10,15 @@ class ChatServer(WebSocket):
     def send_to_all_clients(cls, msg: dict, sender=None):
         # user_names = list(map(lambda client: client.username, enumerate(cls.clients)))
         # print(user_names)
-        online_users = res= list(map(lambda  clnt : {"id":clnt[0], "name":clnt[1].username}
-              , enumerate(cls.clients)))
+        # online_users = list(map(lambda  clnt : {"id":clnt[0], "name":clnt[1].username}
+        #       , enumerate(cls.clients)))
+        online_users = []
+        for id, client in enumerate(cls.clients):
+            online_users.append({'id': id, 'name': client.username})
+            client.id=  id
+
+        # add ids_to_object
+
         msg['online']=online_users
         print(online_users)
         msg = json.dumps(msg)
@@ -20,6 +27,7 @@ class ChatServer(WebSocket):
                 client.send_message(msg)
             else:
                 client.send_message(json.dumps({'online':online_users}))
+                print(sender.id)
 
     def handle(self):
         # what will happen when the server receive a message
