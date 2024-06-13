@@ -35,6 +35,14 @@ mywebsocket.onopen = function (){
 // 2- on message ?
 mywebsocket.onmessage= function (event){
     console.log(event)
+    let received_msg = JSON.parse(event.data)
+    if (received_msg.type==='login'){
+        chat_div.innerHTML +=`<h3 style="color: green; text-align: center">${received_msg.body}</h3>`
+    }else if(received_msg.type==='logout'){
+        chat_div.innerHTML +=`<h3 style="color: red; text-align: center">${received_msg.body}</h3>`
+
+    }
+
 }
 
 
